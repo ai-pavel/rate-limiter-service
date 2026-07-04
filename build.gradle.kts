@@ -3,6 +3,7 @@ import com.google.protobuf.gradle.*
 plugins {
     kotlin("jvm") version "1.9.22"
     id("com.google.protobuf") version "0.9.4"
+    jacoco
     application
 }
 
@@ -81,6 +82,13 @@ application {
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+    }
 }
 
 kotlin {
