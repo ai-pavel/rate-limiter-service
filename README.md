@@ -1,5 +1,7 @@
 # Rate Limiter gRPC Service
 
+[![CI](https://github.com/pavel-genai/rate-limiter-service/actions/workflows/ci.yml/badge.svg)](https://github.com/pavel-genai/rate-limiter-service/actions/workflows/ci.yml)
+
 A Kotlin gRPC microservice implementing distributed rate limiting with Redis-backed state storage.
 
 ## Features
