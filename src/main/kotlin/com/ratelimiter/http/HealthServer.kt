@@ -30,9 +30,13 @@ class HealthServer(private val port: Int = 8080) {
         }
     }
 
+    /** Actual port the server is bound to (useful when constructed with port 0). */
+    val boundPort: Int
+        get() = server.address.port
+
     fun start() {
         server.start()
-        logger.info("Health HTTP server started on port {}", port)
+        logger.info("Health HTTP server started on port {}", boundPort)
     }
 
     fun stop() {
