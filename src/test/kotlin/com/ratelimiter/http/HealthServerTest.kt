@@ -62,7 +62,7 @@ class HealthServerTest {
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        assertEquals("""{"status":"ok","service":"rate-limiter-service"}""", response.body())
+        assertEquals("""{"status":"ok","service":"pacer"}""", response.body())
     }
 
     @Test

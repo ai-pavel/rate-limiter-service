@@ -12,7 +12,7 @@ class HealthServer(private val port: Int = 8080) {
 
     private val logger = LoggerFactory.getLogger(HealthServer::class.java)
 
-    private val body = """{"status":"ok","service":"rate-limiter-service"}""".toByteArray(Charsets.UTF_8)
+    private val body = """{"status":"ok","service":"pacer"}""".toByteArray(Charsets.UTF_8)
 
     private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0).apply {
         createContext("/health") { exchange ->
