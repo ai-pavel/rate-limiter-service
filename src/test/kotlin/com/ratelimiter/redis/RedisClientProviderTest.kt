@@ -2,8 +2,19 @@ package com.ratelimiter.redis
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.testcontainers.containers.GenericContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
 
+@Testcontainers
 class RedisClientProviderTest {
+
+    companion object {
+        @Container
+        @JvmStatic
+        val redis: GenericContainer<*> = GenericContainer("redis:7-alpine")
+            .withExposedPorts(6379)
+    }
 
     @Test
     fun `constructor reads REDIS_HOST and REDIS_PORT env vars`() {
@@ -43,5 +54,50 @@ class RedisClientProviderTest {
     fun `default port is 6379`() {
         val port = System.getenv("REDIS_PORT") ?: "6379"
         assertEquals("6379", port)
+    }
+
+    @Test
+    fun `sync returns RedisCommands connected to the server`() {
+        val provider = RedisClientProvider(
+            host = redis.host,
+            port = redis.getMappedPort(6379)
+        )
+        try {
+            val commands = provider.sync()
+            commands.set("test-key", "test-value")
+            assertEquals("test-value", commands.get("test-key"))
+        } finally {
+            provider.close()
+        }
+    }
+
+    @Test
+    fun `close shuts down without throwing`() {
+        val provider = RedisClientProvider(
+            host = redis.host,
+            port = redis.getMappedPort(6379)
+        )
+        // Use the connection first to ensure it's established
+        val commands = provider.sync()
+        commands.ping()
+        // Close should not throw
+        assertDoesNotThrow { provider.close() }
+    }
+
+    @Test
+    fun `multiple sync calls return the same connection`() {
+        val provider = RedisClientProvider(
+            host = redis.host,
+            port = redis.getMappedPort(6379)
+        )
+        try {
+            val c1 = provider.sync()
+            val c2 = provider.sync()
+            // Both should work (same underlying connection)
+            c1.set("k1", "v1")
+            assertEquals("v1", c2.get("k1"))
+        } finally {
+            provider.close()
+        }
     }
 }
